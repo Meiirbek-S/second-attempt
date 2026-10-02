@@ -1,2 +1,3 @@
 // Same-origin Cloudflare Worker by default. For a separate frontend, use its HTTPS Worker URL.
-export const SUBMISSION_ENDPOINT = '/api/confirm';
+export const SUBMISSION_ENDPOINT = 
+  'https://meyirbek-s.workers.dev/api/confirm';
