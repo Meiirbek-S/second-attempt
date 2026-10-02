@@ -1,0 +1,17 @@
+export const MAIN=[['cinema','CINEMA',"Movie first. We'll figure out the rest later."],['bowling','BOWLING',"Let's see who's actually competitive."],['shooting-range','SHOOTING RANGE',"Let's find out who's got better aim."],['billiards','BILLIARDS','Simple rules. Questionable skills.'],['custom','YOUR IDEA',"Got a better idea? I'm listening."]];
+export const SECOND=[['cinema','CINEMA','A little big-screen escapism.'],['dinner','DINNER','Good food. Better company.'],['night-drive','NIGHT DRIVE','Nowhere in a hurry.'],['coffee','COFFEE','One more conversation.'],['dessert','DESSERT','End on a sweet note.'],['custom','YOUR IDEA',"I'm still listening."],['none','NOTHING — ONE IS ENOUGH','']];
+export const MUSIC=[['your-bluetooth','YOUR BLUETOOTH','You get the aux. No judgment.'],['my-playlist','MY PLAYLIST','Trust me.'],['50-50','50 / 50','Diplomatic solution.']];
+export const DATES=['2026-10-23','2026-10-24','2026-10-25','2026-10-26','any'];
+export const TIMES=['17:00','18:00','19:00','20:00','other'];
+export const initialState=()=>({mainActivity:'',mainActivityCustom:'',secondActivity:'',secondActivityCustom:'',music:'',date:'',time:'',customTime:'',pickup:''});
+export const normalize=s=>s.trim().toLowerCase().replace(/[\s_-]+/g,' ');
+export function activity(s,which){const value=s[which+'Activity'];return value==='custom'?s[which+'ActivityCustom'].trim():value==='none'?'':([...MAIN,...SECOND].find(x=>x[0]===value)?.[1]||'');}
+export const hasDrive=s=>[activity(s,'main'),activity(s,'second')].some(x=>normalize(x)==='night drive');
+export const competitive=s=>['bowling','shooting range','billiards'].includes(normalize(activity(s,'main')));
+export function cleanup(s){if(s.mainActivity!=='custom')s.mainActivityCustom='';if(s.secondActivity!=='custom')s.secondActivityCustom='';if(s.time!=='other')s.customTime='';if(activity(s,'main')&&normalize(activity(s,'main'))===normalize(activity(s,'second'))){s.secondActivity='';s.secondActivityCustom='';}if(!hasDrive(s))s.music='';return s;}
+export const steps=s=>['intro','main','second',...(hasDrive(s)?['music']:[]),'date','time','pickup','review','confirmed'];
+export const displayDate=d=>d==='any'?'Any day works':new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(d+'T12:00:00Z'));
+export const displayTime=s=>s.time==='other'?s.customTime:s.time;
+export const timeValid=t=>/^([01]\d|2[0-3]):[0-5]\d$/.test(t);
+export function validateStep(s,step){if(step==='main'&&(!MAIN.some(x=>x[0]===s.mainActivity)||(s.mainActivity==='custom'&&!s.mainActivityCustom.trim())))return 'Pick the main event, or tell me your idea.';if(step==='second'&&(!SECOND.some(x=>x[0]===s.secondActivity)||(s.secondActivity==='custom'&&!s.secondActivityCustom.trim())))return 'Pick a second stop, or choose one is enough.';if(step==='second'&&s.secondActivity!=='none'&&normalize(activity(s,'main'))===normalize(activity(s,'second')))return 'Let’s make the second stop something different.';if(step==='music'&&hasDrive(s)&&!MUSIC.some(x=>x[0]===s.music))return 'Choose who controls the music.';if(step==='date'&&!DATES.includes(s.date))return 'Pick a date, or choose any day works.';if(step==='time'&&(!TIMES.includes(s.time)||!timeValid(displayTime(s))))return 'Choose a time, or enter another time.';if(step==='pickup'&&!s.pickup.trim())return 'Tell me where to pick you up.';return '';}
+export function validatePlan(s){for(const step of steps(s)){const error=validateStep(s,step);if(error)return {step,error};}return null;}

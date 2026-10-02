@@ -1,0 +1,12 @@
+/* Soft invitation layer: compact, friendly choice chips. */
+.wordmark{font:italic 400 clamp(22px,4vw,34px)/1 var(--serif);letter-spacing:-.05em;color:#343037}
+.wordmark em{color:var(--pink);font-weight:400}
+.masthead{justify-content:center;min-height:102px}
+.masthead .wordmark{text-align:center}
+.choices{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.choice{min-height:70px;padding:15px 34px 14px 17px;border-radius:19px;background:rgba(255,255,255,.58)}
+.choice .desc{font-size:12px;line-height:1.4;margin-top:5px}
+.check{top:14px;right:13px;width:17px;height:17px;font-size:10px}
+.choice.wide{min-height:58px}
+.page:before{content:'♡  ✦  ♡';display:block;text-align:right;color:#d994a6;font:18px var(--serif);letter-spacing:.24em;margin:2px 6px -8px}
+@media(max-width:640px){.choices{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.choice{min-height:69px;padding:15px 34px 14px 15px;border-radius:17px}.choice .desc{font-size:11px}.page:before{font-size:15px;margin-bottom:-4px}}
